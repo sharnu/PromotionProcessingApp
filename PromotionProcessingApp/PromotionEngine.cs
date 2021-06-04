@@ -15,24 +15,7 @@ namespace PromotionProcessingApp
     public abstract class BasePromotion
     {
         #region Promotion InMemory Data Object
-        protected readonly List<Promotion> _promotions = new List<Promotion>()
-        {
-            new Promotion(){ Id= 1, Name ="Promotion-A3", PromotionType = PromotionType.FlatPrice, Value = 130, IsBundledPromotion = false,
-            Products = new List<DiscountProduct> {
-                    new DiscountProduct(){ Id = 1, ProductId = 'A', DiscountQuantity = 3, PromotionId = 1 },
-            } },
-
-            new Promotion(){ Id = 2, Name ="Promotion-B2", PromotionType = PromotionType.FlatPrice, Value = 45, IsBundledPromotion = false,
-            Products = new List<DiscountProduct> {
-                    new DiscountProduct(){ Id = 2, ProductId = 'B', DiscountQuantity = 2, PromotionId = 2 },
-            } },
-
-              new Promotion(){ Id = 3, Name ="Promotion-C&D", PromotionType = PromotionType.FlatPrice, Value = 30, IsBundledPromotion = true,
-            Products = new List<DiscountProduct> {
-                    new DiscountProduct(){ Id = 3, ProductId = 'C', DiscountQuantity = 1, PromotionId = 3 },
-                    new DiscountProduct(){ Id = 4, ProductId = 'D', DiscountQuantity = 1, PromotionId = 3 },
-            } }
-        };
+        protected List<Promotion> _promotions = new List<Promotion>();
         #endregion
 
         protected static void AddSubTotal(Cart cart)
@@ -59,6 +42,7 @@ namespace PromotionProcessingApp
         public SingleProductFlatPricePromotion(IPromotionRepository promotionRepository)
         {
             _promotionRepository = promotionRepository;
+            _promotions.AddRange(_promotionRepository.GetAllSingleProductPromotions());
         }
 
         public Cart CalculateCartTotal(Cart cart)
@@ -68,9 +52,9 @@ namespace PromotionProcessingApp
             if (cart != null && !cart.CartItems.Any())
                 return cart;
 
-            var productPromotion = _promotions.OrderBy(p => p.IsBundledPromotion);
+            //var productPromotion = _promotions.OrderBy(p => p.IsBundledPromotion);
 
-            foreach (var promotion in productPromotion)
+            foreach (var promotion in _promotions)
             {
                 if (promotion.IsBundledPromotion == false)
                 {
@@ -107,6 +91,7 @@ namespace PromotionProcessingApp
         public BundledProductsFlatPricePromotion(IPromotionRepository promotionRepository)
         {
             _promotionRepository = promotionRepository;
+            _promotions.AddRange(_promotionRepository.GetAllBundleProductPromotions());
         }
 
         public Cart CalculateCartTotal(Cart cart)
@@ -116,8 +101,8 @@ namespace PromotionProcessingApp
             if (cart != null && !cart.CartItems.Any())
                 return cart;
 
-            var productPromotion = _promotions.OrderBy(p => p.IsBundledPromotion);
-            foreach (var promotion in productPromotion)
+            //var productPromotion = _promotions.OrderBy(p => p.IsBundledPromotion);
+            foreach (var promotion in _promotions)
             {
                 if (promotion.IsBundledPromotion == true)
                 {
