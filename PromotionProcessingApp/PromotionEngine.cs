@@ -54,6 +54,13 @@ namespace PromotionProcessingApp
 
     public class SingleProductFlatPricePromotion : BasePromotion, IPromotionRule
     {
+        private readonly IPromotionRepository _promotionRepository;
+
+        public SingleProductFlatPricePromotion(IPromotionRepository promotionRepository)
+        {
+            _promotionRepository = promotionRepository;
+        }
+
         public Cart CalculateCartTotal(Cart cart)
         {
             Cart result = MapCart(cart);
@@ -95,6 +102,13 @@ namespace PromotionProcessingApp
 
     public class BundledProductsFlatPricePromotion : BasePromotion, IPromotionRule
     {
+        private readonly IPromotionRepository _promotionRepository;
+
+        public BundledProductsFlatPricePromotion(IPromotionRepository promotionRepository)
+        {
+            _promotionRepository = promotionRepository;
+        }
+
         public Cart CalculateCartTotal(Cart cart)
         {
             Cart result = MapCart(cart);
@@ -135,6 +149,13 @@ namespace PromotionProcessingApp
 
     public class NonPromotionProducts : BasePromotion, IPromotionRule
     {
+        private readonly IPromotionRepository _promotionRepository;
+
+        public NonPromotionProducts(IPromotionRepository promotionRepository)
+        {
+            _promotionRepository = promotionRepository;
+        }
+
         public Cart CalculateCartTotal(Cart cart)
         {
             Cart result = MapCart(cart);
@@ -144,7 +165,6 @@ namespace PromotionProcessingApp
                 foreach (var nonDiscountedCartProduct in nonDiscountedCartProducts)
                 {
                     nonDiscountedCartProduct.SubTotal = nonDiscountedCartProduct.Product.Price * nonDiscountedCartProduct.Quantity;
-                    //result.CartItems.Add(nonDiscountedCartProduct);
                     result.CartItems.Where(c => c.Id == nonDiscountedCartProduct.Id).Select(c => { return nonDiscountedCartProduct; });
                 }
             }
@@ -157,31 +177,44 @@ namespace PromotionProcessingApp
 
     public class PromotionEngine
     {
-        private IPromotionRepository promotionRepository;
-        private List<Promotion> _promotions = new List<Promotion>();
+        List<IPromotionRule> _promotionRules = new List<IPromotionRule>();
 
-        public PromotionEngine(IPromotionRepository promotionRepository)
+        public PromotionEngine(IEnumerable<IPromotionRule> promotionRules)
         {
-            this.promotionRepository = promotionRepository;
-            _promotions = promotionRepository.GetAllPromotions().ToList();
+            _promotionRules.AddRange(promotionRules);
         }
-
+      
         public Cart CalculateCartTotal(Cart cart)
         {
+            Cart result = null;
             if (cart != null && !cart.CartItems.Any())
                 return cart;
-
-            SingleProductFlatPricePromotion singleProductFlatPricePromotion = new SingleProductFlatPricePromotion();
-            BundledProductsFlatPricePromotion bundledProductsFlatPricePromotion = new BundledProductsFlatPricePromotion();
-            NonPromotionProducts nonPromotionProducts = new NonPromotionProducts();
-
-            _ = singleProductFlatPricePromotion.CalculateCartTotal(cart);
-            _ = bundledProductsFlatPricePromotion.CalculateCartTotal(cart);
-            var result = nonPromotionProducts.CalculateCartTotal(cart);
+            
+            foreach (var promotionRule in _promotionRules)
+            {
+                result = promotionRule.CalculateCartTotal(cart);
+            }
 
             return result;
         }
 
+    }
+
+    public class PromotionCalculator
+    {
+        public Cart CalculatePromotion(Cart cart)
+        {
+            Object[] args = { new PromotionRepository() };
+
+            var ruleType = typeof(IPromotionRule);
+            IEnumerable<IPromotionRule> promotionRules = this.GetType().Assembly.GetTypes()
+                .Where(p => ruleType.IsAssignableFrom(p) && !p.IsInterface)
+                .Select(r => Activator.CreateInstance(r, args) as IPromotionRule);
+
+            var engine = new PromotionEngine(promotionRules);
+
+            return engine.CalculateCartTotal(cart);
+        }
     }
 
 

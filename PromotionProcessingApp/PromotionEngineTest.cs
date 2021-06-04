@@ -9,13 +9,11 @@ namespace PromotionProcessingApp.Tests
     public class PromotionEngineTest
     {
 
-        private IPromotionRepository promotionRepository;
-        private PromotionEngine _promotionEngine;
+        private PromotionCalculator _promotionCalculator;
 
         public PromotionEngineTest()
         {
-            promotionRepository = new PromotionRepository();
-            _promotionEngine = new PromotionEngine(promotionRepository);
+            _promotionCalculator = new PromotionCalculator();
         }
 
         [Fact(DisplayName = "Scenario 1")]
@@ -23,7 +21,7 @@ namespace PromotionProcessingApp.Tests
         {
             var products = GetProductsFromCart();
 
-            var result = _promotionEngine.CalculateCartTotal(products);
+            var result = _promotionCalculator.CalculatePromotion(products);
 
             result.Total.Should().Be(100m);
         }
@@ -33,7 +31,7 @@ namespace PromotionProcessingApp.Tests
         {
             var products = GetMultipleQuantitiesOfSameProductFromCart();
 
-            var result = _promotionEngine.CalculateCartTotal(products);
+            var result = _promotionCalculator.CalculatePromotion(products);
 
             result.Total.Should().Be(100m);
         }
@@ -43,7 +41,7 @@ namespace PromotionProcessingApp.Tests
         {
             var cart = GetProductsHavingDiscountFromCart();
 
-            var result = _promotionEngine.CalculateCartTotal(cart);
+            var result = _promotionCalculator.CalculatePromotion(cart);
 
             result.Total.Should().Be(370m);
         }
@@ -53,7 +51,7 @@ namespace PromotionProcessingApp.Tests
         {
             var cart = GetProductsHavingBundledDiscountFromCart();
 
-            var result = _promotionEngine.CalculateCartTotal(cart);
+            var result = _promotionCalculator.CalculatePromotion(cart);
 
             result.Total.Should().Be(280m);
         }
