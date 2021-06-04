@@ -52,28 +52,23 @@ namespace PromotionProcessingApp
             if (cart != null && !cart.CartItems.Any())
                 return cart;
 
-            //var productPromotion = _promotions.OrderBy(p => p.IsBundledPromotion);
 
             foreach (var promotion in _promotions)
             {
-                if (promotion.IsBundledPromotion == false)
-                {
-                    var cartItemData = cart.CartItems
-                                        .FirstOrDefault(c => c.Product.Id == promotion.Products.First().ProductId);
+                var cartItemData = cart.CartItems
+                                    .FirstOrDefault(c => c.Product.Id == promotion.Products.First().ProductId);
 
-                    if (cartItemData != null)
+                if (cartItemData != null)
+                {
+                    int quantity = cartItemData.Quantity;
+                    int promotionQuantity = promotion.Products.First().DiscountQuantity;
+                    if (quantity >= promotionQuantity)
                     {
-                        int quantity = cartItemData.Quantity;
-                        int promotionQuantity = promotion.Products.First().DiscountQuantity;
-                        if (quantity >= promotionQuantity)
-                        {
-                            decimal discountedQuantity = decimal.Floor(quantity / promotionQuantity);
-                            cartItemData.SubTotal = discountedQuantity * promotion.Value;
-                            cartItemData.SubTotal += (quantity - (discountedQuantity * promotionQuantity)) * cartItemData.Product.Price;
-                            cart.CartItems.First(c => c.Id == cartItemData.Id).IsPromotionApplied = true;
-                            //result.CartItems.Add(cartItemData);
-                            result.CartItems.Where(c=> c.Id == cartItemData.Id).Select(c=> { return cartItemData; });
-                        }
+                        decimal discountedQuantity = decimal.Floor(quantity / promotionQuantity);
+                        cartItemData.SubTotal = discountedQuantity * promotion.Value;
+                        cartItemData.SubTotal += (quantity - (discountedQuantity * promotionQuantity)) * cartItemData.Product.Price;
+                        cart.CartItems.First(c => c.Id == cartItemData.Id).IsPromotionApplied = true;
+                        result.CartItems.Where(c => c.Id == cartItemData.Id).Select(c => { return cartItemData; });
                     }
                 }
             }
@@ -101,27 +96,22 @@ namespace PromotionProcessingApp
             if (cart != null && !cart.CartItems.Any())
                 return cart;
 
-            //var productPromotion = _promotions.OrderBy(p => p.IsBundledPromotion);
             foreach (var promotion in _promotions)
             {
-                if (promotion.IsBundledPromotion == true)
+                var cartProducts = cart.CartItems.Where(c => promotion.Products.Any(p => p.ProductId == c.Product.Id && c.Quantity >= p.DiscountQuantity) && c.IsPromotionApplied == false);
+                if (cartProducts != null && cartProducts.Any() && cartProducts.Count() == promotion.Products.Count())
                 {
-                    var cartProducts = cart.CartItems.Where(c => promotion.Products.Any(p => p.ProductId == c.Product.Id && c.Quantity >= p.DiscountQuantity) && c.IsPromotionApplied == false);
-                    if (cartProducts != null && cartProducts.Any() && cartProducts.Count() == promotion.Products.Count())
+                    bool IsPromotionApplied = false;
+                    foreach (var cartProduct in cartProducts)
                     {
-                        bool IsPromotionApplied = false;
-                        foreach (var cartProduct in cartProducts)
+                        int quantity = cartProduct.Quantity;
+                        int promotionQuantity = promotion.Products.First(c => c.ProductId == cartProduct.Product.Id).DiscountQuantity;
+                        if (!IsPromotionApplied)
                         {
-                            int quantity = cartProduct.Quantity;
-                            int promotionQuantity = promotion.Products.First(c => c.ProductId == cartProduct.Product.Id).DiscountQuantity;
-                            if (!IsPromotionApplied)
-                            {
-                                cartProduct.SubTotal = promotion.Value;
-                            }
-                            cartProduct.IsPromotionApplied = IsPromotionApplied = true;
-                            //result.CartItems.Add(cartProduct);
-                            result.CartItems.Where(c => c.Id == cartProduct.Id).Select(c => { return cartProduct; });
+                            cartProduct.SubTotal = promotion.Value;
                         }
+                        cartProduct.IsPromotionApplied = IsPromotionApplied = true;
+                        result.CartItems.Where(c => c.Id == cartProduct.Id).Select(c => { return cartProduct; });
                     }
                 }
             }
@@ -157,7 +147,7 @@ namespace PromotionProcessingApp
             AddSubTotal(result);
             return result;
         }
-        
+
     }
 
     public class PromotionEngine
@@ -168,13 +158,13 @@ namespace PromotionProcessingApp
         {
             _promotionRules.AddRange(promotionRules);
         }
-      
+
         public Cart CalculateCartTotal(Cart cart)
         {
             Cart result = null;
             if (cart != null && !cart.CartItems.Any())
                 return cart;
-            
+
             foreach (var promotionRule in _promotionRules)
             {
                 result = promotionRule.CalculateCartTotal(cart);
