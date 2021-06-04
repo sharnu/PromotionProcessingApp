@@ -95,3 +95,4 @@ D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\bin\Debu
 D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
 D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\obj\Debug\netcoreapp3.1\PromotionProcessingApp.csprojAssemblyReference.cache

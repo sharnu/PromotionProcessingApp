@@ -74,10 +74,9 @@ namespace PromotionProcessingApp
                             if (!IsPromotionApplied)
                             {
                                 cartProduct.SubTotal = promotion.Value;
-                                //cartProduct.IsPromotionApplied = IsPromotionApplied = true;
-                                result.CartItems.Add(cartProduct);
                             }
                             cartProduct.IsPromotionApplied = IsPromotionApplied = true;
+                            result.CartItems.Add(cartProduct);
                         }
                     }
                 }
