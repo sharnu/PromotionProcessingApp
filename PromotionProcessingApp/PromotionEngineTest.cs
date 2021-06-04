@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using PromotionProcessingApp.Models;
+using FluentAssertions;
+using System.Collections.Generic;
 using Xunit;
 
-namespace PromotionProcessingApp
+namespace PromotionProcessingApp.Tests
 {
     public class PromotionEngineTest
     {
@@ -12,7 +14,7 @@ namespace PromotionProcessingApp
         {
             var products = GetProductsFromCart();
 
-            var result = _promotionEngine.CalculateCartTotal(products);
+            decimal result = _promotionEngine.CalculateCartTotal(products);
 
             result.Should().Be(115m);
         }
@@ -26,10 +28,10 @@ namespace PromotionProcessingApp
         {
             return new List<Product>()
             {
-                new Product() { Id = 'A', Price = 50m},
-                new Product() { Id = 'B', Price = 30m},
-                new Product() { Id = 'C', Price = 20m},
-                new Product() { Id = 'D', Price = 15m},
+                new Product('A', 50m),
+                new Product('B', 30m),
+                new Product('C', 20m),
+                new Product('D', 15m),
             };
         }
 

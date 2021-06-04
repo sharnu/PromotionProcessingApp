@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\konapure_s\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\konapure_s\\.nuget\\packages"
+    ]
+  }
+}
