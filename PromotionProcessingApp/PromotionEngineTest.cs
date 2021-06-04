@@ -2,12 +2,21 @@
 using FluentAssertions;
 using System.Collections.Generic;
 using Xunit;
+using PromotionProcessingApp.Repository;
 
 namespace PromotionProcessingApp.Tests
 {
     public class PromotionEngineTest
     {
-        private PromotionEngine _promotionEngine = new PromotionEngine();
+
+        private IPromotionRepository promotionRepository;
+        private PromotionEngine _promotionEngine;
+
+        public PromotionEngineTest()
+        {
+            promotionRepository = new PromotionRepository();
+            _promotionEngine = new PromotionEngine(promotionRepository);
+        }
 
         [Fact(DisplayName = "Scenario 1")]
         public void ReturnsCartTotalForNonDiscountedProducts()

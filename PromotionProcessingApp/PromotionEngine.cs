@@ -1,32 +1,22 @@
-﻿using PromotionProcessingApp.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using PromotionProcessingApp.Models;
+using PromotionProcessingApp.Repository;
 
 namespace PromotionProcessingApp
 {
     public class PromotionEngine
     {
-        List<Promotion> _promotions = new List<Promotion>()
+        private IPromotionRepository promotionRepository;
+        private List<Promotion> _promotions = new List<Promotion>();
+
+        public PromotionEngine(IPromotionRepository promotionRepository)
         {
-            new Promotion(){ Id= 1, Name ="Promotion-A3", PromotionType = PromotionType.FlatPrice, Value = 130, IsBundledPromotion = false,
-            Products = new List<DiscountProduct> {
-                    new DiscountProduct(){ Id = 1, ProductId = 'A', DiscountQuantity = 3, PromotionId = 1 },
-            } },
-
-            new Promotion(){ Id = 2, Name ="Promotion-B2", PromotionType = PromotionType.FlatPrice, Value = 45, IsBundledPromotion = false,
-            Products = new List<DiscountProduct> {
-                    new DiscountProduct(){ Id = 2, ProductId = 'B', DiscountQuantity = 2, PromotionId = 2 },
-            } },
-
-              new Promotion(){ Id = 3, Name ="Promotion-C&D", PromotionType = PromotionType.FlatPrice, Value = 30, IsBundledPromotion = true,
-            Products = new List<DiscountProduct> {
-                    new DiscountProduct(){ Id = 3, ProductId = 'C', DiscountQuantity = 1, PromotionId = 3 },
-                    new DiscountProduct(){ Id = 4, ProductId = 'D', DiscountQuantity = 1, PromotionId = 3 },
-            } }
-        };
-
+            this.promotionRepository = promotionRepository;
+            _promotions = promotionRepository.GetAllPromotions().ToList();
+        }
 
 
         public Cart CalculateCartTotal(Cart cart)
