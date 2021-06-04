@@ -95,3 +95,4 @@ D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\obj\Debu
 D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\obj\Debug\netcoreapp3.1\PromotionProcessingApp.dll
 D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\obj\Debug\netcoreapp3.1\PromotionProcessingApp.pdb
 D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\obj\Debug\netcoreapp3.1\PromotionProcessingApp.genruntimeconfig.cache
+D:\PromotionProcessingApp\PromotionProcessingApp\PromotionProcessingApp\obj\Debug\netcoreapp3.1\PromotionProcessingApp.csprojAssemblyReference.cache

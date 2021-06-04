@@ -6,11 +6,12 @@ using PromotionProcessingApp.Repository;
 
 namespace PromotionProcessingApp
 {
-    public interface IPromotionRule
+    public interface IPromotionRule 
     {
         Cart CalculateCartTotal(Cart cart);
+        List<char> Priority { get; }
     }
-    
+
     public interface IPromotionCalculator
     {
         Cart CalculatePromotion(Cart cart);
@@ -23,9 +24,9 @@ namespace PromotionProcessingApp
 
     public abstract class BasePromotion
     {
-        #region Promotion InMemory Data Object
         protected List<Promotion> _promotions = new List<Promotion>();
-        #endregion
+
+        public List<char> Priority { get; protected set; } = new List<char>();
 
         protected static void AddSubTotal(Cart cart)
         {
@@ -52,6 +53,7 @@ namespace PromotionProcessingApp
         {
             _promotionRepository = promotionRepository;
             _promotions.AddRange(_promotionRepository.GetAllSingleProductPromotions());
+            Priority.Add('a');
         }
 
         public Cart CalculateCartTotal(Cart cart)
@@ -96,6 +98,7 @@ namespace PromotionProcessingApp
         {
             _promotionRepository = promotionRepository;
             _promotions.AddRange(_promotionRepository.GetAllBundleProductPromotions());
+            Priority.Add('b');
         }
 
         public Cart CalculateCartTotal(Cart cart)
@@ -138,6 +141,7 @@ namespace PromotionProcessingApp
         public NonPromotionProducts(IPromotionRepository promotionRepository)
         {
             _promotionRepository = promotionRepository;
+            Priority.Add('c');
         }
 
         public Cart CalculateCartTotal(Cart cart)
@@ -174,6 +178,7 @@ namespace PromotionProcessingApp
             if (cart != null && !cart.CartItems.Any())
                 return cart;
 
+            //var sequencedRules = _promotionRules.OrderBy(p => p.Priority).ToList();
             foreach (var promotionRule in _promotionRules)
             {
                 result = promotionRule.CalculateCartTotal(cart);
@@ -188,16 +193,23 @@ namespace PromotionProcessingApp
     {
         public Cart CalculatePromotion(Cart cart)
         {
-            Object[] args = { new PromotionRepository() };
+            try
+            {
+                Object[] args = { new PromotionRepository() };
 
-            var ruleType = typeof(IPromotionRule);
-            IEnumerable<IPromotionRule> promotionRules = this.GetType().Assembly.GetTypes()
-                .Where(p => ruleType.IsAssignableFrom(p) && !p.IsInterface)
-                .Select(r => Activator.CreateInstance(r, args) as IPromotionRule);
+                var ruleType = typeof(IPromotionRule);
+                IEnumerable<IPromotionRule> promotionRules = this.GetType().Assembly.GetTypes()
+                    .Where(p => ruleType.IsAssignableFrom(p) && !p.IsInterface)
+                    .Select(r => Activator.CreateInstance(r, args) as IPromotionRule);
 
-            IPromotionEngine engine = new PromotionEngine(promotionRules);
+                IPromotionEngine engine = new PromotionEngine(promotionRules);
 
-            return engine.CalculateCartTotal(cart);
+                return engine.CalculateCartTotal(cart);
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
         }
     }
 
