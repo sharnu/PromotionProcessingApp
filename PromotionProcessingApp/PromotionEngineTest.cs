@@ -14,9 +14,9 @@ namespace PromotionProcessingApp.Tests
         {
             var products = GetProductsFromCart();
 
-            decimal result = _promotionEngine.CalculateCartTotal(products);
+            var result = _promotionEngine.CalculateCartTotal(products);
 
-            result.Should().Be(115m);
+            result.Total.Should().Be(100m);
         }
 
         [Fact]
@@ -24,63 +24,69 @@ namespace PromotionProcessingApp.Tests
         {
             var products = GetMultipleQuantitiesOfSameProductFromCart();
 
-            decimal result = _promotionEngine.CalculateCartTotal(products);
+            var result = _promotionEngine.CalculateCartTotal(products);
 
-            result.Should().Be(100m);
+            result.Total.Should().Be(100m);
         }
 
         [Fact(DisplayName = "Scenario 2")]
         public void ReturnsCartTotalForDiscountedProducts()
         {
-            var products = GetProductsHavingDiscountFromCart();
+            var cart = GetProductsHavingDiscountFromCart();
 
-            decimal result = _promotionEngine.CalculateCartTotal(products);
+            var result = _promotionEngine.CalculateCartTotal(cart);
 
-            result.Should().Be(320m);
+            result.Total.Should().Be(370m);
         }
 
 
-        private List<Product> GetProductsHavingDiscountFromCart()
+        private Cart GetProductsHavingDiscountFromCart()
         {
-            return new List<Product>()
-            {
-                new Product('A', 50m),
-                new Product('A', 50m),
-                new Product('A', 50m),
-                new Product('A', 50m),
-                new Product('A', 50m),
-                new Product('B', 30m),
-                new Product('B', 30m),
-                new Product('B', 30m),
-                new Product('B', 30m),
-                new Product('B', 30m),
-                new Product('C', 20m),
-            };
+            List<CartItem> cartItem = new List<CartItem>();
+            cartItem.Add(new CartItem(1, new Product('A', 50m), 5, 0m));
+            cartItem.Add(new CartItem(2, new Product('B', 30m), 5, 0m));
+            cartItem.Add(new CartItem(3, new Product('C', 20m), 1, 0m));
+
+            Cart cart = new Cart();
+            cart.CartItems = cartItem;
+            cart.Id = 1;
+            cart.Total = 0;
+
+            return cart;
         }
 
-        private List<Product> GetMultipleQuantitiesOfSameProductFromCart()
+        private Cart GetMultipleQuantitiesOfSameProductFromCart()
         {
-            return new List<Product>()
-            {
-                new Product('A', 50m),
-                new Product('A', 50m),
-            };
+            List<CartItem> cartItem = new List<CartItem>();
+            cartItem.Add(new CartItem(1, new Product('A', 50m), 2, 0m));
+
+            Cart cart = new Cart();
+            cart.CartItems = cartItem;
+            cart.Id = 1;
+            cart.Total = 0;
+
+            return cart;
         }
 
-        private List<Product> GetProductsFromCart()
+        private Cart GetProductsFromCart()
         {
             return this.GetAllProducts();
         }
 
-        private List<Product> GetAllProducts()
+        private Cart GetAllProducts()
         {
-            return new List<Product>()
-            {
-                new Product('A', 50m),
-                new Product('B', 30m),
-                new Product('C', 20m),
-                new Product('D', 15m),
-            };
+            List<CartItem> cartItem = new List<CartItem>();
+            cartItem.Add(new CartItem(1, new Product('A', 50m), 1, 0m));
+            cartItem.Add(new CartItem(2, new Product('B', 30m), 1, 0m));
+            cartItem.Add(new CartItem(3, new Product('C', 20m), 1, 0m));
+
+            Cart cart = new Cart();
+            cart.CartItems = cartItem;
+            cart.Id = 1;
+            cart.Total = 0;
+
+            return cart;
+
         }
 
     }
