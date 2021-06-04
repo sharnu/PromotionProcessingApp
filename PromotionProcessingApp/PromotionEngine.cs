@@ -9,7 +9,7 @@ namespace PromotionProcessingApp
     public interface IPromotionRule 
     {
         Cart CalculateCartTotal(Cart cart);
-        List<char> Priority { get; }
+        int Priority { get; }
     }
 
     public interface IPromotionCalculator
@@ -26,7 +26,7 @@ namespace PromotionProcessingApp
     {
         protected List<Promotion> _promotions = new List<Promotion>();
 
-        public List<char> Priority { get; protected set; } = new List<char>();
+        public int Priority { get; protected set; }
 
         protected static void AddSubTotal(Cart cart)
         {
@@ -43,6 +43,7 @@ namespace PromotionProcessingApp
             result.Total = cart.Total;
             return result;
         }
+
     }
 
     public class SingleProductFlatPricePromotion : BasePromotion, IPromotionRule
@@ -53,7 +54,7 @@ namespace PromotionProcessingApp
         {
             _promotionRepository = promotionRepository;
             _promotions.AddRange(_promotionRepository.GetAllSingleProductPromotions());
-            Priority.Add('a');
+            Priority = 1;
         }
 
         public Cart CalculateCartTotal(Cart cart)
@@ -88,6 +89,7 @@ namespace PromotionProcessingApp
 
             return result;
         }
+
     }
 
     public class BundledProductsFlatPricePromotion : BasePromotion, IPromotionRule
@@ -98,7 +100,7 @@ namespace PromotionProcessingApp
         {
             _promotionRepository = promotionRepository;
             _promotions.AddRange(_promotionRepository.GetAllBundleProductPromotions());
-            Priority.Add('b');
+            Priority = 2;
         }
 
         public Cart CalculateCartTotal(Cart cart)
@@ -141,7 +143,7 @@ namespace PromotionProcessingApp
         public NonPromotionProducts(IPromotionRepository promotionRepository)
         {
             _promotionRepository = promotionRepository;
-            Priority.Add('c');
+            Priority = 3;
         }
 
         public Cart CalculateCartTotal(Cart cart)
@@ -178,8 +180,8 @@ namespace PromotionProcessingApp
             if (cart != null && !cart.CartItems.Any())
                 return cart;
 
-            //var sequencedRules = _promotionRules.OrderBy(p => p.Priority).ToList();
-            foreach (var promotionRule in _promotionRules)
+            // Order by Priority
+            foreach (var promotionRule in _promotionRules.OrderBy(p => p.Priority))
             {
                 result = promotionRule.CalculateCartTotal(cart);
             }
