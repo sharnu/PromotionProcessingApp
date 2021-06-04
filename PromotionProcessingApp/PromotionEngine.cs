@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using PromotionProcessingApp.Models;
 using PromotionProcessingApp.Repository;
@@ -8,6 +7,16 @@ using PromotionProcessingApp.Repository;
 namespace PromotionProcessingApp
 {
     public interface IPromotionRule
+    {
+        Cart CalculateCartTotal(Cart cart);
+    }
+    
+    public interface IPromotionCalculator
+    {
+        Cart CalculatePromotion(Cart cart);
+    }
+
+    public interface IPromotionEngine
     {
         Cart CalculateCartTotal(Cart cart);
     }
@@ -150,7 +159,7 @@ namespace PromotionProcessingApp
 
     }
 
-    public class PromotionEngine
+    public class PromotionEngine : IPromotionEngine
     {
         List<IPromotionRule> _promotionRules = new List<IPromotionRule>();
 
@@ -175,7 +184,7 @@ namespace PromotionProcessingApp
 
     }
 
-    public class PromotionCalculator
+    public class PromotionCalculator : IPromotionCalculator
     {
         public Cart CalculatePromotion(Cart cart)
         {
@@ -186,13 +195,11 @@ namespace PromotionProcessingApp
                 .Where(p => ruleType.IsAssignableFrom(p) && !p.IsInterface)
                 .Select(r => Activator.CreateInstance(r, args) as IPromotionRule);
 
-            var engine = new PromotionEngine(promotionRules);
+            IPromotionEngine engine = new PromotionEngine(promotionRules);
 
             return engine.CalculateCartTotal(cart);
         }
     }
 
-
-
-
+    
 }

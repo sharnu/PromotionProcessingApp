@@ -2,14 +2,13 @@
 using FluentAssertions;
 using System.Collections.Generic;
 using Xunit;
-using PromotionProcessingApp.Repository;
 
 namespace PromotionProcessingApp.Tests
 {
     public class PromotionEngineTest
     {
 
-        private PromotionCalculator _promotionCalculator;
+        private IPromotionCalculator _promotionCalculator;
 
         public PromotionEngineTest()
         {
