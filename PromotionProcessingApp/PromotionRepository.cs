@@ -1,4 +1,5 @@
 ﻿using PromotionProcessingApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,11 +42,11 @@ namespace PromotionProcessingApp.Repository
 
         public IEnumerable<Promotion> GetAllSingleProductPromotions()
         {
-            return _promotions.Where(p => p.Products.Count() == 1);
+            return _promotions.Where(p => p.Products.Count() == 1 && p.PromotionType.Equals(PromotionType.FlatPrice));
         }
         public IEnumerable<Promotion> GetAllBundleProductPromotions()
         {
-            return _promotions.Where(p => p.Products.Count() > 1);
+            return _promotions.Where(p => p.Products.Count() > 1 && p.PromotionType.Equals(PromotionType.FlatPrice));
         }
     }
 }
